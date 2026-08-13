@@ -1,15 +1,9 @@
-// Cloudflare Worker Script for Telegram V2Ray Subscription Generator
-// Deploy this script for free on Cloudflare Workers (https://workers.cloudflare.com)
-
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    
-    // Get channel name from query param (?channel=NamazVPN) or default to NamazVPN
     const channel = url.searchParams.get("channel") || "NamazVPN";
-    const limit = parseInt(url.searchParams.get("limit") || "100");
+    const limit = parseInt(url.searchParams.get("limit") || "30");
 
-    // Fetch Telegram channel web page
     const tgUrl = `https://t.me/s/${channel}`;
     try {
       const response = await fetch(tgUrl, {
@@ -19,18 +13,13 @@ export default {
       });
 
       let html = await response.text();
-      // Decode HTML entities
       html = html.replace(/&amp;/g, '&');
 
-      // Regex matching standard v2ray protocols
       const pattern = /(vless:\/\/[^\s<"'\`]+|vmess:\/\/[^\s<"'\`]+|trojan:\/\/[^\s<"'\`]+|ss:\/\/[^\s<"'\`]+|hysteria2:\/\/[^\s<"'\`]+|hy2:\/\/[^\s<"'\`]+|tuic:\/\/[^\s<"'\`]+)/gi;
-      
       let matches = html.match(pattern) || [];
 
-      // Remove duplicates
       const uniqueLinks = [...new Set(matches)].slice(0, limit);
 
-      // Plain raw list mode if ?raw=true
       if (url.searchParams.get("raw") === "true") {
         return new Response(uniqueLinks.join('\n'), {
           headers: {
@@ -40,7 +29,6 @@ export default {
         });
       }
 
-      // Standard Base64 V2Ray subscription format
       const plainText = uniqueLinks.join('\n');
       const base64Content = btoa(unescape(encodeURIComponent(plainText)));
 
@@ -48,12 +36,12 @@ export default {
         headers: {
           "content-type": "text/plain; charset=utf-8",
           "Access-Control-Allow-Origin": "*",
-          "Cache-Control": "public, max-age=300" // Cache for 5 minutes
+          "Cache-Control": "public, max-age=300"
         }
       });
 
     } catch (err) {
-      return new Response(`Error fetching configs: ${err.message}`, { status: 500 });
+      return new Response(`Error: ${err.message}`, { status: 500 });
     }
   }
 };
