@@ -1,0 +1,29 @@
+name: Update V2Ray Subscription
+
+on:
+  schedule:
+    # Run every 1 hour automatically
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allow running manually from GitHub UI
+
+jobs:
+  update-sub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run Update Script
+        run: python update.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add sub.txt sub_raw.txt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update V2Ray subscription" && git push)
