@@ -2,16 +2,22 @@ name: Update V2Ray Subscription
 
 on:
   schedule:
-    # Run every 1 hour automatically
     - cron: '0 * * * *'
-  workflow_dispatch: # Allow running manually from GitHub UI
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update-sub:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
