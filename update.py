@@ -1,4 +1,4 @@
-```python
+
 import urllib.request
 import re
 import html
@@ -127,4 +127,4 @@ def fetch_and_update(channel="NamazVPN", target_count=30):
 
 if __name__ == "__main__":
     fetch_and_update("NamazVPN", 30)
-```
+
